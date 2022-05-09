@@ -108,17 +108,30 @@ function createKeyboard(langKeyboard) {
   deleteAllEpmtyDivs();
 }
 
-createKeyboard(keyboardEng);
+if (localStorage.getItem('lang') === undefined) {
+  localStorage.setItem('lang', 'eng');
+  createKeyboard(keyboardEng);
+} else if (localStorage.getItem('lang') === 'rus') {
+  createKeyboard(keyboardRus);
+  isRus = true;
+  isEng = false;
+} else {
+  createKeyboard(keyboardEng);
+  isRus = false;
+  isEng = true;
+}
 
 function pressCapsLock() {
   if (isCapsLock) {
     isCapsLock = false;
-    document.querySelectorAll('.letter').forEach((letter) => {
+    document.querySelectorAll('.letter').forEach((button) => {
+      const letter = button;
       letter.innerHTML = letter.innerHTML.toLowerCase();
     });
   } else {
     isCapsLock = true;
-    document.querySelectorAll('.letter').forEach((letter) => {
+    document.querySelectorAll('.letter').forEach((button) => {
+      const letter = button;
       letter.innerHTML = letter.innerHTML.toUpperCase();
     });
   }
@@ -133,7 +146,8 @@ function pressEnter() {
   const startLength = textTag.value.length;
   textTag.value = `${textTag.value.slice(0, textTag.selectionStart)}\n${textTag.value.slice(textTag.selectionStart, textTag.value.length)}`;
   const endLength = textTag.value.length;
-  textTag.selectionStart = textTag.selectionEnd = test + (endLength - startLength);
+  textTag.selectionStart = test + (endLength - startLength);
+  textTag.selectionEnd = test + (endLength - startLength);
 }
 
 function pressTab() {
@@ -141,7 +155,8 @@ function pressTab() {
   const startLength = textTag.value.length;
   textTag.value = `${textTag.value.slice(0, textTag.selectionStart)}\t${textTag.value.slice(textTag.selectionStart, textTag.value.length)}`;
   const endLength = textTag.value.length;
-  textTag.selectionStart = textTag.selectionEnd = test + (endLength - startLength);
+  textTag.selectionStart = test + (endLength - startLength);
+  textTag.selectionEnd = test + (endLength - startLength);
 }
 
 function pressBackspace() {
@@ -149,20 +164,23 @@ function pressBackspace() {
   if (textTag.selectionStart === 0) return;
   textTag.value = textTag.value.slice(0, textTag.selectionStart - 1)
     + textTag.value.slice(textTag.selectionStart, textTag.value.length);
-  textTag.selectionStart = textTag.selectionEnd = test;
+  textTag.selectionStart = test;
+  textTag.selectionEnd = test;
 }
 
 function pressSpace() {
   const test = textTag.selectionStart;
   textTag.value = `${textTag.value.slice(0, textTag.selectionStart)} ${textTag.value.slice(textTag.selectionStart, textTag.value.length)}`;
-  textTag.selectionStart = textTag.selectionEnd = test + 1;
+  textTag.selectionStart = test + 1;
+  textTag.selectionEnd = test + 1;
 }
 
 function pressUsualButton(button) {
   const test = textTag.selectionStart;
   textTag.value = textTag.value.slice(0, textTag.selectionStart) + button
     + textTag.value.slice(textTag.selectionStart, textTag.value.length);
-  textTag.selectionStart = textTag.selectionEnd = test + 1;
+  textTag.selectionStart = test + 1;
+  textTag.selectionEnd = test + 1;
 }
 
 keyboardTag.addEventListener('mousedown', (event) => {
@@ -343,8 +361,10 @@ document.addEventListener('keyup', (event) => {
   if (isPressedShift && isPressedAlt) {
     if (isEng) {
       createKeyboard(keyboardRus);
+      localStorage.setItem('lang', 'rus');
     } else {
       createKeyboard(keyboardEng);
+      localStorage.setItem('lang', 'eng');
     }
     isEng = !isEng;
     isRus = !isRus;
