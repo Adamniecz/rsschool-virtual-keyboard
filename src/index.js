@@ -1,3 +1,9 @@
+/* eslint linebreak-style: ["error", "windows"] */
+
+// Верхний комментарий убирает только эту ошибку
+// Expected linebreaks to be 'LF' but found 'CRLF'
+// которая не считается нарушением
+
 const keyboardRus = ['ё', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
   'Tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', '\\',
   'CapsLock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'Enter',
@@ -54,8 +60,13 @@ function createKeyboard(langKeyboard) {
     addEngSymbol.classList.add('add-eng');
     const specSymbol = document.createElement('div');
     specSymbol.classList.add('spec-symbol');
+    const numberSymbol = document.createElement('div');
+    numberSymbol.classList.add('number');
     if (langKeyboard[i].length === 1 && (langKeyboard[i].match(/[a-zA-Z]/) || langKeyboard[i].match(/[а-яА-ЯёЁ]/))) {
       newKey.classList.add('letter');
+    }
+    if (langKeyboard[i].length === 1 && (langKeyboard[i].match(/[0-9]/))) {
+      numberSymbol.textContent = langKeyboard[i];
     }
     if (langKeyboard[i] === 'Backspace'
       || langKeyboard[i] === 'Enter'
@@ -68,17 +79,15 @@ function createKeyboard(langKeyboard) {
       specSymbol.textContent = langKeyboard[i];
       newKey.classList.add('spec-key');
     } else if (langKeyboard === keyboardRus) {
-      mainRusSymbol.textContent = langKeyboard[i];
-      if (keyboardRusAddNumsSymbols[i]) {
-        addRusSymbol.textContent = keyboardRusAddNumsSymbols[i];
-        newKey.classList.add('add-symbol');
+      if (!langKeyboard[i].match(/[0-9]/)) {
+        mainRusSymbol.textContent = langKeyboard[i];
       }
+      addRusSymbol.textContent = keyboardRusAddNumsSymbols[i];
     } else {
-      mainEngSymbol.textContent = langKeyboard[i];
-      if (keyboardEngAddNumsSymbols[i]) {
-        addEngSymbol.textContent = keyboardEngAddNumsSymbols[i];
-        newKey.classList.add('add-symbol');
+      if (!langKeyboard[i].match(/[0-9]/)) {
+        mainEngSymbol.textContent = langKeyboard[i];
       }
+      addEngSymbol.textContent = keyboardEngAddNumsSymbols[i];
     }
     if (langKeyboard[i] === 'Backspace'
       || langKeyboard[i] === 'Enter'
@@ -101,7 +110,14 @@ function createKeyboard(langKeyboard) {
     if (langKeyboard[i] === 'Win') {
       newKey.classList.add('win');
     }
-    newKey.append(mainRusSymbol, addRusSymbol, mainEngSymbol, addEngSymbol, specSymbol);
+    newKey.append(
+      mainRusSymbol,
+      addRusSymbol,
+      mainEngSymbol,
+      addEngSymbol,
+      specSymbol,
+      numberSymbol,
+    );
 
     document.querySelector('.keyboard').append(newKey);
   }
@@ -338,10 +354,11 @@ document.addEventListener('keydown', (event) => {
         }
       }
     }
+    return;
   }
   if (isRus) {
     for (let i = 0; i < keyboardRus.length; i += 1) {
-      if ((event.code === `Key${keyboardEng[i].toUpperCase()}` || button === keyboardRus[i]) && button.length === 1) {
+      if ((button === keyboardRus[i] || event.code === `Key${keyboardEng[i].toUpperCase()}`) && button.length === 1) {
         if (isCapsLock) {
           pressUsualButton(keyboardRus[i].toUpperCase());
           break;
